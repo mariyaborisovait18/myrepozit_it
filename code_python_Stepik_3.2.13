@@ -1,0 +1,52 @@
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+import unittest
+import time
+
+class TestRegistration(unittest.TestCase):
+    
+    def setUp(self):
+        self.browser = webdriver.Chrome()
+        self.browser.implicitly_wait(5)
+
+    def tearDown(self):
+        time.sleep(2)
+        self.browser.quit()
+
+    def test_registration1(self):
+        browser = self.browser
+        link = "http://suninjuly.github.io/registration1.html"
+        browser.get(link)
+
+        # Ищем поля по атрибуту placeholder (он одинаковый на обеих страницах для нужных полей)
+        browser.find_element(By.CSS_SELECTOR, "input[placeholder='Input your first name']").send_keys("Ivan")
+        browser.find_element(By.CSS_SELECTOR, "input[placeholder='Input your last name']").send_keys("Petrov")
+        browser.find_element(By.CSS_SELECTOR, "input[placeholder='Input your email']").send_keys("test@test.com")
+
+        browser.find_element(By.CSS_SELECTOR, "button.btn").click()
+
+        welcome_text_elt = browser.find_element(By.TAG_NAME, "h1")
+        welcome_text = welcome_text_elt.text
+        self.assertEqual("Congratulations! You have successfully registered!", welcome_text, "Текст не совпадает")
+
+    def test_registration2(self):
+        browser = self.browser
+        link = "http://suninjuly.github.io/registration2.html"
+        browser.get(link)
+
+        # На этой странице не будет поля Email (или оно будет называться иначе), 
+        # поэтому тест упадёт с ошибкой NoSuchElementException. Это и нужно.
+        
+        browser.find_element(By.CSS_SELECTOR, "input[placeholder='Input your first name']").send_keys("Ivan")
+        browser.find_element(By.CSS_SELECTOR, "input[placeholder='Input your last name']").send_keys("Petrov")
+        # Эта строка вызовет ошибку, так как поля с таким placeholder на странице нет:
+        browser.find_element(By.CSS_SELECTOR, "input[placeholder='Input your email']").send_keys("test@test.com")
+
+        browser.find_element(By.CSS_SELECTOR, "button.btn").click()
+
+        welcome_text_elt = browser.find_element(By.TAG_NAME, "h1")
+        welcome_text = welcome_text_elt.text
+        self.assertEqual("Congratulations! You have successfully registered!", welcome_text, "Текст не совпадает")
+
+if __name__ == "__main__":
+    unittest.main()
